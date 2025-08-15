@@ -1,13 +1,32 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Depends
 from fastapi.responses import HTMLResponse
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel
+from jose import JWTError, jwt
 import json
 import datetime
 
 app = FastAPI(title="Personal Data API", description="Get your cohort data by email")
 
+SECRET_KEY = "your-secret-key-change-in-production"
+ALGORITHM = "HS256"
+security = HTTPBearer()
+
 class HandleRequest(BaseModel):
     handle: str
+
+class LoginRequest(BaseModel):
+    email: str
+
+def create_token(email: str):
+    return jwt.encode({"email": email, "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=24)}, SECRET_KEY, ALGORITHM)
+
+def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    try:
+        payload = jwt.decode(credentials.credentials, SECRET_KEY, algorithms=[ALGORITHM])
+        return payload["email"]
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Invalid token")
 
 def log_request(handle: str, success: bool):
     log_entry = {
@@ -25,8 +44,19 @@ def log_request(handle: str, success: bool):
     with open('requests.json', 'w') as f:
         json.dump(logs, f, indent=2)
 
+@app.post("/auth/login")
+async def login(request: LoginRequest):
+    with open('people.json', 'r') as f:
+        people = json.load(f)
+    
+    for person in people.values():
+        if person['email'] == request.email:
+            return {"token": create_token(request.email)}
+    
+    raise HTTPException(status_code=401, detail="Email not found")
+
 @app.post("/get-profile")
-async def get_profile(request: HandleRequest):
+async def get_profile(request: HandleRequest, email: str = Depends(verify_token)):
     try:
         with open('people.json', 'r') as f:
             people = json.load(f)
@@ -55,7 +85,7 @@ async def get_profile(request: HandleRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/dashboard", response_class=HTMLResponse)
-async def dashboard():
+async def dashboard(email: str = Depends(verify_token)):
     try:
         with open('requests.json', 'r') as f:
             logs = json.load(f)
