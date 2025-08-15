@@ -63,6 +63,8 @@ Get your cohort profile data using this secure API. Follow these steps to authen
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 }
 ```
+<img width="600" height="400" alt="Screenshot 2025-08-15 171411" src="https://github.com/user-attachments/assets/91900de2-ef06-40b7-af92-f7d6e4d1922b" />
+
 
 ## Step 3: Get Your Profile Data
 
