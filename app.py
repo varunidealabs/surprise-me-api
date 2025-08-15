@@ -19,7 +19,7 @@ class LoginRequest(BaseModel):
     email: str
 
 def create_token(email: str):
-    return jwt.encode({"email": email, "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=24)}, SECRET_KEY, ALGORITHM)
+    return jwt.encode({"email": email, "exp": datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=24)}, SECRET_KEY, ALGORITHM)
 
 def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
     try:
@@ -56,7 +56,7 @@ async def login(request: LoginRequest):
     raise HTTPException(status_code=401, detail="Email not found")
 
 @app.post("/get-profile")
-async def get_profile(request: HandleRequest, email: str = Depends(verify_token)):
+async def get_profile(request: HandleRequest, _: str = Depends(verify_token)):
     try:
         with open('people.json', 'r') as f:
             people = json.load(f)
@@ -85,7 +85,7 @@ async def get_profile(request: HandleRequest, email: str = Depends(verify_token)
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/dashboard", response_class=HTMLResponse)
-async def dashboard(email: str = Depends(verify_token)):
+async def dashboard():
     try:
         with open('requests.json', 'r') as f:
             logs = json.load(f)
@@ -93,7 +93,7 @@ async def dashboard(email: str = Depends(verify_token)):
         success = sum(1 for log in logs if log['success'])
         unique = len(set(log.get('handle', log.get('email', '')) for log in logs))
         recent = logs[-5:] if logs else []
-    except:
+    except FileNotFoundError:
         total = success = unique = 0
         recent = []
     
