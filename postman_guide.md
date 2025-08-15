@@ -64,7 +64,7 @@ Personal profile API with JWT authentication. Get your cohort data securely usin
 ### Step 2: First Login to Get Your Token
 1. **Open Postman** → Click "New" → Select "HTTP Request"
    
-   <img width="469" height="441" alt="image" src="https://github.com/user-attachments/assets/167a2f27-3657-4f33-a3bc-f181bf9a4eba" />
+<img width="1151" height="442" alt="image" src="https://github.com/user-attachments/assets/4d4581a5-e3f1-4ca5-a03c-327656cda161" />
 
 2. **Set Method**: Change dropdown from "GET" to **"POST"**
 3. **Enter Login URL**: Copy and paste:
