@@ -92,7 +92,7 @@ async def dashboard():
         total = len(logs)
         success = sum(1 for log in logs if log['success'])
         unique = len(set(log.get('handle', log.get('email', '')) for log in logs))
-        recent = logs[-5:] if logs else []
+        recent = list(reversed(logs)) if logs else []
     except FileNotFoundError:
         total = success = unique = 0
         recent = []
@@ -111,8 +111,10 @@ async def dashboard():
     <h3>Unique Users</h3><h2 style="color:#FF9800">{unique}</h2></div>
     </div>
     <div style="background:white;padding:20px;border-radius:8px;box-shadow:0 2px 4px rgba(0,0,0,0.1)">
-    <h3>Recent Requests</h3>
-    {''.join(f'<p>{log["timestamp"][:19]} - {log.get("handle", log.get("email", "unknown"))} - {"✅" if log["success"] else "❌"}</p>' for log in recent)}
+    <h3>All Requests (Latest First)</h3>
+    <div style="max-height:400px;overflow-y:auto;">
+    {''.join(f'<p style="margin:5px 0;padding:5px;background:#f9f9f9;border-radius:3px">{log["timestamp"][:19]} - {log.get("handle", log.get("email", "unknown"))} - {"✅" if log["success"] else "❌"}</p>' for log in recent)}
+    </div>
     </div></body></html>"""
 
 if __name__ == "__main__":
