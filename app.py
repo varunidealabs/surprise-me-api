@@ -6,13 +6,13 @@ import datetime
 
 app = FastAPI(title="Personal Data API", description="Get your cohort data by email")
 
-class EmailRequest(BaseModel):
-    email: str
+class HandleRequest(BaseModel):
+    handle: str
 
-def log_request(email: str, success: bool):
+def log_request(handle: str, success: bool):
     log_entry = {
         "timestamp": datetime.datetime.now().isoformat(),
-        "email": email,
+        "handle": handle,
         "success": success
     }
     try:
@@ -26,17 +26,17 @@ def log_request(email: str, success: bool):
         json.dump(logs, f, indent=2)
 
 @app.post("/get-profile")
-async def get_profile(request: EmailRequest):
+async def get_profile(request: HandleRequest):
     try:
         with open('people.json', 'r') as f:
             people = json.load(f)
         
-        if request.email not in people:
-            log_request(request.email, False)
-            raise HTTPException(status_code=404, detail="Email not found")
+        if request.handle not in people:
+            log_request(request.handle, False)
+            raise HTTPException(status_code=404, detail="Handle not found")
         
-        person = people[request.email]
-        log_request(request.email, True)
+        person = people[request.handle]
+        log_request(request.handle, True)
         
         return {
             "message": f"🎉 Hey {person['name']}! Here's your amazing profile:",
@@ -51,7 +51,7 @@ async def get_profile(request: EmailRequest):
         }
     
     except Exception as e:
-        log_request(request.email, False)
+        log_request(request.handle, False)
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/dashboard", response_class=HTMLResponse)
@@ -61,7 +61,7 @@ async def dashboard():
             logs = json.load(f)
         total = len(logs)
         success = sum(1 for log in logs if log['success'])
-        unique = len(set(log['email'] for log in logs))
+        unique = len(set(log.get('handle', log.get('email', '')) for log in logs))
         recent = logs[-5:] if logs else []
     except:
         total = success = unique = 0
@@ -82,7 +82,7 @@ async def dashboard():
     </div>
     <div style="background:white;padding:20px;border-radius:8px;box-shadow:0 2px 4px rgba(0,0,0,0.1)">
     <h3>Recent Requests</h3>
-    {''.join(f'<p>{log["timestamp"][:19]} - {log["email"]} - {"✅" if log["success"] else "❌"}</p>' for log in recent)}
+    {''.join(f'<p>{log["timestamp"][:19]} - {log.get("handle", log.get("email", "unknown"))} - {"✅" if log["success"] else "❌"}</p>' for log in recent)}
     </div></body></html>"""
 
 if __name__ == "__main__":
