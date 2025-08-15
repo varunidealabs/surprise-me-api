@@ -89,6 +89,7 @@ Get your cohort profile data using this secure API. Follow these steps to authen
    - Click "Authorization" tab (next to Headers)
    - Select "Bearer Token" from dropdown
    - In the "Token" field, paste your copied token (without "Bearer " prefix)
+<img width="600" height="350" alt="Screenshot 2025-08-15 171703" src="https://github.com/user-attachments/assets/cff59562-206c-42d0-9b53-404450fa2c25" />
 
 5. **Add Request Body**
    - Click "Body" tab
@@ -104,7 +105,6 @@ Get your cohort profile data using this secure API. Follow these steps to authen
 6. **Send Request**
    - Click "Send"
    - Your profile data will appear below
-<img width="600" height="350" alt="Screenshot 2025-08-15 171703" src="https://github.com/user-attachments/assets/cff59562-206c-42d0-9b53-404450fa2c25" />
 <img width="600" height="400" alt="Screenshot 2025-08-15 171643" src="https://github.com/user-attachments/assets/63c7eafc-525e-4c6c-9049-073733262eec" />
 
 
